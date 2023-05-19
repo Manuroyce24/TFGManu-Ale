@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{../css/friends.css}">
+    <meta charset="UTF-8">
+    <title>Thirty</title>
+</head>
+
+<body>
+    <div th:replace="/fragments/header :: header"></div>
+
+    <div class="containerfriends">
+
+        <div th:if="${isAuthenticated}">
+            <!-- Mostrar el error de usuario no encontrado -->
+            <div th:if="${userNotFoundError}" class="alert alert-danger" th:text="${userNotFoundError}"></div>
+            <!-- Mostrar el error de ya son amigos -->
+            <div th:if="${alreadyFriendsError}" class="alert alert-info" th:text="${alreadyFriendsError}"></div>
+                            <label for="receiverUsername" class="username-label">Nombre de usuario:</label>
+            
+            <form action="/friend-request/send" method="post">
+                <input type="hidden" name="senderId" th:value="${currentUser.id}" />
+                <input type="text" id="receiverUsername" name="receiverUsername" placeholder="Introduce el nombre de usuario">
+                <button id="enviarSoli" type="submit">Enviar solicitud de amistad</button>
+            </form>
+        </div>
+
+        <div th:if="${#lists.isEmpty(sentFriendRequests)}">
+            <p>No has enviado solicitudes de amistad o todas tus solicitudes han sido respondidas.</p>
+        </div>
+        <div th:if="!${#lists.isEmpty(sentFriendRequests)}">
+                        <h3>Solicitudes de amistad enviadas</h3>
+        
+            <div class="container2">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="request : ${sentFriendRequests}">
+                            <td th:text="${request.receiver.username}"></td>
+                            <td>
+                                <form action="/friend-request/cancel" method="post" id="notificaciones">
+                                    <input type="hidden" name="friendRequestId" th:value="${request.id}" />
+                                    <button type="submit" id="cancelarSoli">Cancelar solicitud</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(pendingFriendRequests)}">
+            <p id="sinsolicitudes">No hay solicitudes de amistad pendientes</p>
+        </div>
+        <div th:if="!${#lists.isEmpty(pendingFriendRequests)}">
+                        <h3>Solicitudes de amistad pendientes</h3>
+        
+            <div class="container2">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Aceptar</th>
+                            <th>Rechazar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="request : ${pendingFriendRequests}">
+                            <td th:text="${request.sender.username}"></td>
+                            <td>
+                                <form action="/friend-request/accept" method="post" class="notificaciones">
+                                    <input type="hidden" name="friendRequestId" th:value="${request.id}" />
+                                    <button type="submit" id="aceptarSoli">Aceptar</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="/friend-request/reject" method="post" class="notificaciones">
+                                    <input type="hidden" name="friendRequestId" th:value="${request.id}" />
+                                    <button type="submit" id="cancelarSoli">Rechazar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="friend-list">
+    <div>            <p class="username-label">Lista de amigos:</p></div>
+        <div class="container2">
+        <table id="tablaamigos">
+        
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="friend : ${friends}">
+                    <td th:text="${friend.username}"></td>
+                    <td>
+                        <form action="/friend-request/delete" method="post">
+                            <input type="hidden" name="friendId" th:value="${friend.id}" />
+                            <button type="submit" class="red-btn">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+    <footer th:replace="/fragments/footer :: footer"></footer>
+</body>
+
+</html>

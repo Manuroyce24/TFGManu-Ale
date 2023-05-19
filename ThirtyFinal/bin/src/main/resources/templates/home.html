@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="/fragments/head :: head"></head>
+
+<body>
+
+<div th:replace="/fragments/header :: header"></div>
+
+<div class="container">
+    
+  
+
+    <div id="postsContainer" th:include="/fragments/posts :: posts(posts=${posts})"></div>
+    
+    <button id="loadMoreButton" class="btn btn-primary">Cargar más</button>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let page = 1;
+
+        $('#loadMoreButton').click(function () {
+            $.get("/?page=" + page, function (data) {
+                const newPosts = $(data).find('#postsContainer').children();
+                if (newPosts.length > 0) {
+                    $('#postsContainer').append(newPosts);
+                    page++;
+                } else {
+                    $('#loadMoreButton').prop('disabled', true);
+                }
+            });
+        });
+    });
+</script>
+
+<footer th:replace="/fragments/footer :: footer"></footer>
+</body>
+</html>

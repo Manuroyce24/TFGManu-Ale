@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="/fragments/head :: head">
+   
+ 
+</head>
+
+<body>
+
+    <div th:replace="/fragments/header :: header"></div>
+
+    <div class="containerfriends">
+
+        <div th:if="${isAuthenticated}">
+            <form action="/friend-request/send" method="post">
+                <input type="hidden" name="senderId" th:value="${currentUser.id}" />
+<label for="receiverUsername" class="username-label">Nombre de usuario:</label>
+                <input type="text" id="receiverUsername" name="receiverUsername"
+                    placeholder="Introduce el nombre de usuario que quieres buscar">
+                <button id="enviarSoli" type="submit">Enviar solicitud de amistad</button>
+            </form>
+        </div>
+
+        <!-- Solicitudes de amistad pendientes y lista de amigos -->
+        <div th:if="${#lists.isEmpty(pendingFriendRequests)}">
+            <p id="sinsolicitudes">No hay solicitudes de amistad pendientes</p>
+        </div>
+        <div th:if="!${#lists.isEmpty(pendingFriendRequests)}">
+            <div class="container">
+                <h3>Solicitudes de amistad pendientes</h3>
+                <ul>
+                    <li th:each="request : ${pendingFriendRequests}">
+                        <span th:text="${request.sender.username}"></span>
+                        <form action="/friend-request/accept" method="post">
+                            <input type="hidden" name="friendRequestId" th:value="${request.id}" />
+                            <button type="submit">Aceptar</button>
+                        </form>
+                        <form action="/friend-request/reject" method="post">
+                            <input type="hidden" name="friendRequestId" th:value="${request.id}" />
+                            <button type="submit">Rechazar</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+         <p class="username-label">Lista de amigos: </p>
+    </div>
+    <div class="friend-list">
+           
+            <ul>
+                <li th:each="friend : ${friends}">
+                    <span class="friend" th:text="${friend.username}"></span>
+                </li>
+            </ul>
+        </div>
+
+    <footer th:replace="/fragments/footer :: footer"></footer>
+</body>
+
+</html>
